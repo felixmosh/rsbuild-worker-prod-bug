@@ -1,8 +1,24 @@
-import './index.css';
+import { WorkerExtractor } from './WorkerExtractor';
 
-document.querySelector('#root')!.innerHTML = `
-<div class="content">
-  <h1>Vanilla Rsbuild</h1>
-  <p>Start building amazing things with Rsbuild.</p>
-</div>
-`;
+(async function main() {
+  console.log('Server started!');
+
+  const workerExtractor = new WorkerExtractor(
+    new URL('./worker.worker.ts', import.meta.url),
+  );
+
+  const workerPath = workerExtractor.url.pathname;
+  console.log({ workerPath });
+
+  // needed so rspack won't include this file in the bundle
+  // in real example, there is a node_modules lib that loads the worker with `import(worker-path)`
+  const worker = await eval('import(workerPath)');
+
+  if(worker.default && typeof worker.default.default === 'function') {
+    await worker.default.default();
+  }
+
+})();
+if (module.hot) {
+  module.hot.accept();
+}

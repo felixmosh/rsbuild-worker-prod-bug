@@ -12,10 +12,10 @@ import { WorkerExtractor } from './WorkerExtractor';
 
   // needed so rspack won't include this file in the bundle
   // in real example, there is a node_modules lib that loads the worker with `import(worker-path)`
-  const worker = await eval('import(workerPath)');
+  const worker = __non_webpack_require__(workerPath);
 
-  if(worker.default && typeof worker.default.default === 'function') {
-    await worker.default.default();
+  if(worker.default && typeof worker.default === 'function') {
+    await worker.default();
   }
 
 })();
